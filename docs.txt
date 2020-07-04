@@ -1,0 +1,6 @@
+GRID:
+    0: GRASS
+    1: TREE
+    2: STONE
+    3: HOUSE
+    4: HOUSE_PART

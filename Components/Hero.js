@@ -125,16 +125,18 @@ class Hero extends GameObject {
           this.StandingOn(GameObject) &&
           this.Properties.State == States.WALKING_TO_TREE
         ) {
-          GameObject.Properties.Equipment -= 1;
-          this.Properties.Equipment.push({ Type: "Tree", Count: 1 });
-          this.Properties.Tiredness++;
+          console.log(GameObject.Properties.Equipment[0].Count);
+          GameObject.Properties.Equipment[0].Count -= 1;
+          console.log(GameObject.Properties.Equipment);
+          this.Properties.Equipment.push({ Type: "Wood", Count: 1 });
+          this.Properties.Tiredness += 1;
           this.Properties.State = States.GETTING_TREE;
           console.log(GameObject.Properties.Equipment + "|" + GameObject.ID);
         }
       }
     });
 
-    console.log(Base.WorldInstance.GameObjects);
+    //console.log(Base.WorldInstance.GameObjects);
 
     if (this.Properties.State == States.GETTING_TREE) {
       this.Properties.State = States.WALKING_TO_HOUSE;
