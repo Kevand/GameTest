@@ -157,12 +157,10 @@ export default class World {
       }
     }
 
-    //adding player on house
+    //adding player and house
 
     this.HouseObject = new House(RandomHousePosition.x, RandomHousePosition.y);
     this.HeroObject = new Hero(RandomHousePosition.x, RandomHousePosition.y);
-
-    console.log(this.GameObjects);
   }
 
   //Drawing all game objects
@@ -188,20 +186,27 @@ export default class World {
     //drawing player
     this.HouseObject.Draw(Context);
     this.HeroObject.Draw(Context);
+
+    //Draw UI
+    Context.fillStyle = "#fff";
+    Context.font = "20px Verdana";
+    this.HouseObject.Properties.Inventory.forEach((Item, Index) => {
+      Context.fillText(Item.Type + ": " + Item.Count, 16, 32 + Index * 32);
+    });
   }
 
   Update() {
     //updating state of every gameobject
     this.GameObjects.forEach((GameObject) => {
-      GameObject.Update();
       if (
         GameObject instanceof Tree &&
-        GameObject.Properties.Equipment[0].Count == 0
+        GameObject.Properties.Inventory[0].Count == 0
       ) {
-        this.GameObjects = this.GameObjects.filter((e, i) => {
+        this.GameObjects = this.GameObjects.filter((e) => {
           return e.ID != GameObject.ID;
         });
       }
+      GameObject.Update();
     });
 
     //updating state of player

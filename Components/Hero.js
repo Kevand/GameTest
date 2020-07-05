@@ -26,9 +26,11 @@ class Hero extends GameObject {
 
     this.Properties = {
       State: States.IDLE,
-      Equipment: [],
+      Inventory: [],
       Tiredness: 0,
     };
+
+    this.FocusedObject = null;
   }
 
   Draw(Context) {
@@ -92,8 +94,7 @@ class Hero extends GameObject {
       );
       TreesDistance.push({
         Distance: Distance,
-        x: Tree.Position.x,
-        y: Tree.Position.y,
+        Tree: Tree,
       });
     });
 
@@ -115,24 +116,20 @@ class Hero extends GameObject {
 
     if (this.Properties.State == States.FINDING_TREE) {
       let NearestTree = this.FindNearestTree();
-      this.MoveTo(NearestTree.x, NearestTree.y);
+      this.MoveTo(NearestTree.Tree.Position.x, NearestTree.Tree.Position.y);
       this.Properties.State = States.WALKING_TO_TREE;
+      this.FocusedObject = NearestTree.Tree;
     }
 
     Base.WorldInstance.GameObjects.forEach((GameObject) => {
-      if (GameObject instanceof Tree) {
-        if (
-          this.StandingOn(GameObject) &&
-          this.Properties.State == States.WALKING_TO_TREE
-        ) {
-          console.log(GameObject.Properties.Equipment[0].Count);
-          GameObject.Properties.Equipment[0].Count -= 1;
-          console.log(GameObject.Properties.Equipment);
-          this.Properties.Equipment.push({ Type: "Wood", Count: 1 });
-          this.Properties.Tiredness += 1;
-          this.Properties.State = States.GETTING_TREE;
-          console.log(GameObject.Properties.Equipment + "|" + GameObject.ID);
-        }
+      if (
+        this.StandingOn(GameObject) &&
+        this.Properties.State == States.WALKING_TO_TREE &&
+        this.FocusedObject.ID === GameObject.ID
+      ) {
+        GameObject.Properties.Inventory[0].Count -= 1;
+        this.Properties.Inventory.push({ Type: "Wood", Count: 1 });
+        this.Properties.State = States.GETTING_TREE;
       }
     });
 
@@ -150,10 +147,31 @@ class Hero extends GameObject {
       this.StandingOn(Base.WorldInstance.HouseObject) &&
       this.Properties.State == States.WALKING_TO_HOUSE
     ) {
-      Base.WorldInstance.HouseObject.Equipment.push(
-        this.Properties.Equipment[0]
-      );
-      this.Properties.Equipment = [];
+      this.Properties.Inventory.forEach((Item) => {
+        let Contain = false;
+        Base.WorldInstance.HouseObject.Properties.Inventory.forEach(
+          (HouseItem) => {
+            if (Item.Type == HouseItem.Type) {
+              HouseItem.Count += Item.Count;
+              this.Properties.Inventory = this.Properties.Inventory.filter(
+                (e) => {
+                  return e.Type != Item.Type;
+                }
+              );
+
+              Contain = true;
+            }
+          }
+        );
+
+        if (!Contain) {
+          Base.WorldInstance.HouseObject.Properties.Inventory.push(Item);
+          this.Properties.Inventory = this.Properties.Inventory.filter((e) => {
+            return e.Type != Item.Type;
+          });
+        }
+      });
+
       this.Properties.State = States.FINDING_TREE;
     }
 

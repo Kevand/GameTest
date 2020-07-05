@@ -4,7 +4,7 @@ import Base from "./Base.js";
 
 let TreeTypes = Object.freeze({
   SMALL: {
-    Equipment: [
+    Inventory: [
       {
         Type: "Wood",
         Count: 2,
@@ -13,7 +13,7 @@ let TreeTypes = Object.freeze({
     Size: 4,
   },
   MEDIUM: {
-    Equipment: [
+    Inventory: [
       {
         Type: "Wood",
         Count: 4,
@@ -22,7 +22,7 @@ let TreeTypes = Object.freeze({
     Size: 8,
   },
   LARGE: {
-    Equipment: [
+    Inventory: [
       {
         Type: "Wood",
         Count: 6,
@@ -31,7 +31,7 @@ let TreeTypes = Object.freeze({
     Size: 12,
   },
   EXTRA_LARGE: {
-    Equipment: [
+    Inventory: [
       {
         Type: "Wood",
         Count: 8,
@@ -46,6 +46,7 @@ export default class Tree extends GameObject {
     super(x, y);
 
     this.Properties = Extra.GetRandomProperty(TreeTypes);
+    this.LastEq = this.Properties.Inventory[0].Count;
   }
 
   Draw(context) {
@@ -61,5 +62,12 @@ export default class Tree extends GameObject {
     context.fill();
   }
 
-  Update() {}
+  Update() {
+    if (this.LastEq != this.Properties.Inventory[0].Count) {
+      this.LastEq = this.Properties.Inventory[0].Count;
+      console.log("Value Changed: ( ID: " + this.ID + " )");
+    }
+
+    super.Update();
+  }
 }
